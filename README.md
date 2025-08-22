@@ -25,8 +25,8 @@ If you find any errors in the book, we appreciate if you let us know. They will 
 
 ------------------------
 
-Best Regards, 
-Jan-Fredrik Olsen
+Best Regards, <br>
+Jan-Fredrik Olsen <br>
 https://portal.research.lu.se/sv/persons/jan-fredrik-olsen
 
 
