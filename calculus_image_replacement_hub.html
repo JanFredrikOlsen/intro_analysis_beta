@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculus Textbook — Image Replacement Hub</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #121a33;
+      --muted: #93a3b8;
+      --text: #e7eefc;
+      --accent: #76b3ff;
+      --ok: #11a36a;
+      --warn: #ffb020;
+      --bad: #ef476f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: linear-gradient(180deg, #0b1020 0%, #0e1630 100%);
+      color: var(--text);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      position: sticky; top: 0; z-index: 40;
+      backdrop-filter: blur(8px);
+      background: rgba(11,16,32,.8);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .topbar {
+      display: flex; gap: 12px; align-items: center; padding: 12px 16px; max-width: 1200px; margin: 0 auto;
+    }
+    .brand { font-weight: 800; letter-spacing: .3px; }
+    .filters { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding: 6px 10px; border-radius: 999px; cursor: pointer; font-size: 13px; color: var(--text);
+    }
+    .pill.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(118,179,255,.2) inset; }
+
+    .layout { display: grid; grid-template-columns: 280px 1fr; gap: 18px; max-width: 1200px; margin: 0 auto; padding: 16px; }
+    nav {
+      position: sticky; top: 56px; align-self: start; max-height: calc(100vh - 64px); overflow: auto;
+      background: var(--card); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 12px;
+    }
+    nav h3 { margin: 8px 8px 6px; font-size: 13px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    nav a { display: block; padding: 8px 10px; border-radius: 8px; }
+    nav a:hover { background: rgba(255,255,255,.06); }
+
+    main { display: grid; gap: 20px; }
+    .card {
+      background: var(--card); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 14px;
+    }
+    .card h2 { margin: 8px 0 8px; }
+
+    .grid { display: grid; gap: 10px; }
+    @media (min-width: 800px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1100px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .item { border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 12px; display: grid; gap: 10px; background: rgba(255,255,255,.02); }
+    .item header { position: relative; background: transparent; border: 0; backdrop-filter: none; }
+    .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .k { color: var(--muted); font-size: 12px; }
+    .chip { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); }
+    .risk-high { background: rgba(239,71,111,.12); border-color: rgba(239,71,111,.5); color: #ffc6d2; }
+    .risk-med { background: rgba(255,176,32,.12); border-color: rgba(255,176,32,.5); color: #ffe2b5; }
+    .risk-low { background: rgba(17,163,106,.12); border-color: rgba(17,163,106,.5); color: #b4f5de; }
+
+    .filename {
+      display: inline-flex; align-items: center; gap: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; background: rgba(255,255,255,.06); padding: 6px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,.12);
+    }
+    .copy { cursor: pointer; font-size: 11px; padding: 4px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); }
+
+    .links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .linkbtn { font-size: 12px; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); }
+
+    .muted { color: var(--muted); }
+    footer { text-align: center; color: var(--muted); padding: 24px; }
+    .legend { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+    .search { display:flex; gap:8px; align-items:center; }
+    .search input { width: 260px; max-width: 100%; padding:8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); color: var(--text); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">📚 Calculus Textbook — Image Replacement Hub</div>
+      <div class="search">
+        <input id="searchBox" placeholder="Search description or filename…" />
+      </div>
+      <div class="filters">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="high">High risk</button>
+        <button class="pill" data-filter="med">Medium</button>
+        <button class="pill" data-filter="low">Low</button>
+        <button class="pill" data-filter="unknown">Needs filename</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <h3>Chapters</h3>
+      <a href="#dash">Dashboard</a>
+      <a href="#ch1">Chapter 1</a>
+      <a href="#ch2">Chapter 2</a>
+      <a href="#ch3">Chapter 3</a>
+      <a href="#ch4">Chapter 4</a>
+      <a href="#ch5">Chapter 5</a>
+      <a href="#ch6">Chapter 6</a>
+      <a href="#ch7">Chapter 7</a>
+      <a href="#ch8">Chapter 8</a>
+      <a href="#ch9">Chapter 9</a>
+      <a href="#ch10">Chapter 10</a>
+      <a href="#ch11">Chapter 11</a>
+      <a href="#ch12">Chapter 12</a>
+      <a href="#ch13">Chapter 13</a>
+      <h3>Guides</h3>
+      <a href="#licensing">Licensing 101</a>
+      <a href="#toolkit">Replacement Toolkit</a>
+    </nav>
+
+    <main>
+      <section id="dash" class="card">
+        <h2>Dashboard</h2>
+        <p class="muted">Filter by risk level to prioritize what to replace first. Click a filename to copy. Use the resource buttons to find safe alternatives.</p>
+        <div class="legend">
+          <span class="chip risk-high">High = almost certainly replace</span>
+          <span class="chip risk-med">Medium = verify or recreate</span>
+          <span class="chip risk-low">Low = likely OK (confirm license)</span>
+          <span class="chip">Unknown = filename not found in log</span>
+        </div>
+      </section>
+
+      <section id="ch1" class="card">
+        <h2>Chapter 1</h2>
+        <div class="grid" id="list-ch1"></div>
+      </section>
+
+      <section id="ch2" class="card">
+        <h2>Chapter 2</h2>
+        <div class="grid" id="list-ch2"></div>
+      </section>
+
+      <section id="ch3" class="card">
+        <h2>Chapter 3</h2>
+        <div class="grid" id="list-ch3"></div>
+      </section>
+
+      <section id="ch4" class="card">
+        <h2>Chapter 4</h2>
+        <div class="grid" id="list-ch4"></div>
+      </section>
+
+      <section id="ch5" class="card">
+        <h2>Chapter 5</h2>
+        <div class="grid" id="list-ch5"></div>
+      </section>
+
+      <section id="ch6" class="card">
+        <h2>Chapter 6</h2>
+        <div class="grid" id="list-ch6"></div>
+      </section>
+
+      <section id="ch7" class="card">
+        <h2>Chapter 7</h2>
+        <div class="grid" id="list-ch7"></div>
+      </section>
+
+      <section id="ch8" class="card">
+        <h2>Chapter 8</h2>
+        <div class="grid" id="list-ch8"></div>
+      </section>
+
+      <section id="ch9" class="card">
+        <h2>Chapter 9</h2>
+        <div class="grid" id="list-ch9"></div>
+      </section>
+
+      <section id="ch10" class="card">
+        <h2>Chapter 10</h2>
+        <div class="grid" id="list-ch10"></div>
+      </section>
+
+      <section id="ch11" class="card">
+        <h2>Chapter 11</h2>
+        <div class="grid" id="list-ch11"></div>
+      </section>
+
+      <section id="ch12" class="card">
+        <h2>Chapter 12</h2>
+        <div class="grid" id="list-ch12"></div>
+      </section>
+
+      <section id="ch13" class="card">
+        <h2>Chapter 13</h2>
+        <div class="grid" id="list-ch13"></div>
+      </section>
+
+      <section id="licensing" class="card">
+        <h2>Licensing 101 (super short)</h2>
+        <ul>
+          <li><strong>Public Domain (PD)</strong>: Free to use, no permission required. Still credit the source when possible.</li>
+          <li><strong>Creative Commons (CC)</strong>: Use per license. Prefer CC0, CC BY, or CC BY-SA. Avoid NC/ND for textbooks unless you’re sure.</li>
+          <li><strong>Famous characters, brands, packaging, album art, movie posters</strong>: almost always <em>not</em> OK. Create your own or use CC/PD substitutes.</li>
+          <li><strong>Old portraits & paintings</strong>: The work may be PD; make sure the <em>photo/scan</em> you’re using is PD/CC too.</li>
+          <li><strong>Your own graphics</strong>: Best! Keep your source files. Add a small note like “© You, CC BY 4.0”.</li>
+        </ul>
+      </section>
+
+      <section id="toolkit" class="card">
+        <h2>Replacement Toolkit</h2>
+        <p>Use these to source safe replacements fast:</p>
+        <div class="links" style="margin-bottom:8px">
+          <a class="linkbtn" target="_blank" href="https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&search=">Wikimedia Commons (search)</a>
+          <a class="linkbtn" target="_blank" href="https://openverse.org/search/image?q=&license=cc0,by,by-sa">Openverse (CC images)</a>
+          <a class="linkbtn" target="_blank" href="https://images.nasa.gov/">NASA (PD)</a>
+          <a class="linkbtn" target="_blank" href="https://www.defense.gov/Multimedia/Photos/">U.S. DoD Photos (mostly PD)</a>
+          <a class="linkbtn" target="_blank" href="https://www.loc.gov/pictures/">Library of Congress (PD-heavy)</a>
+          <a class="linkbtn" target="_blank" href="https://www.metmuseum.org/art/collection/search#!?q=&showOnly=openAccess">The Met Open Access (PD)</a>
+        </div>
+        <p class="muted">Always save the source URL, author, and license text alongside your image in a credits file.</p>
+      </section>
+
+      <footer>
+        Built as a practical triage tool for your manuscript. — You’ve got this 💪
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Helpers to build consistent resource links
+    const linkBuilders = {
+      commons: (q) => ({ label: 'Wikimedia Commons', url: `https://commons.wikimedia.org/wiki/Special:MediaSearch?type=image&search=${encodeURIComponent(q)}` }),
+      openverse: (q) => ({ label: 'Openverse (CC)', url: `https://openverse.org/search/image?q=${encodeURIComponent(q)}&license=cc0,by,by-sa` }),
+      nasa: (q) => ({ label: 'NASA (PD)', url: `https://images.nasa.gov/search?q=${encodeURIComponent(q)}` }),
+      dod: (q) => ({ label: 'U.S. DoD (PD)', url: `https://www.defense.gov/Multimedia/Photos/?igsearch=${encodeURIComponent(q)}` }),
+      loc: (q) => ({ label: 'Library of Congress', url: `https://www.loc.gov/pictures/search/?q=${encodeURIComponent(q)}` }),
+      met: (q) => ({ label: 'The Met Open Access', url: `https://www.metmuseum.org/art/collection/search#!?q=${encodeURIComponent(q)}&showOnly=openAccess` })
+    };
+
+    // Data — one entry per figure to triage
+    // status: high | med | low
+    // filename: string or null if not found in log
+    const ITEMS = [
+      // Chapter 1
+      {chapter: 1, fig: 'Fig. 1', desc: 'Cat playing board game “Carcassonne”', filename: 'carcassone.png', status:'high', reason:'Board game artwork + brand; likely copyrighted.', rec:'Stage your own generic game photo or draw tiles; avoid brand art.', q:'board game tiles generic'},
+      {chapter: 1, fig: 'Fig. 2', desc: 'G. H. Hardy portrait', filename: 'ch1_hardy.jpg', status:'low', reason:'Portrait likely PD if sourced correctly.', rec:'Use PD portrait from Commons with PD/CC tag.', q:'G. H. Hardy portrait'},
+      {chapter: 1, fig: 'Fig. 3', desc: 'Homer Simpson', filename: 'simpsons_higgs2.png', status:'high', reason:'TV/cartoon character; copyrighted.', rec:'Replace with your own original cartoon or a PD alternative (no trademarks).', q:'cartoon mathematician public domain'},
+      {chapter: 1, fig: 'Fig. 4', desc: 'Michelangelo — Creation of Adam (ceiling)', filename: 'creation2.png', status:'med', reason:'Art is PD; photo/scan may not be.', rec:'Use a PD/CC scan from Commons with clear license.', q:'Creation of Adam high resolution public domain'},
+      {chapter: 1, fig: 'Fig. 5', desc: 'Smiley face', filename: 'zero_dizzy.jpg', status:'med', reason:'Some “smiley” designs are trademarked.', rec:'Draw your own simple emoji or use an OFL/PD emoji.', q:'smiley icon public domain'},
+      {chapter: 1, fig: 'Fig. 6', desc: 'Generic chess image', filename: 'chess2.png', status:'med', reason:'Internet photo likely copyrighted.', rec:'Use CC0 chess photos/diagrams or render your own board.', q:'chess pieces CC0 photo'},
+      {chapter: 1, fig: 'Fig. 10', desc: 'Carl Friedrich Gauss portrait', filename: 'ch2_gauss.jpg', status:'low', reason:'Historical portrait; typically PD.', rec:'Swap to a PD portrait on Commons if unsure.', q:'Carl Friedrich Gauss portrait'},
+      {chapter: 1, fig: 'Fig. 11', desc: 'Dominoes (game pieces) photo', filename: 'dominos.png', status:'med', reason:'Generic photo may be copyrighted.', rec:'Replace with CC0 photo or your own shot.', q:'domino tiles public domain'},
+      {chapter: 1, fig: 'Fig. 12', desc: 'Blaise Pascal portrait', filename: 'ch0_pascal2.jpg', status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Blaise Pascal portrait'},
+      {chapter: 1, fig: 'Fig. 15', desc: 'Cartoony black sheep', filename: 'ch2_blacksheep.png', status:'high', reason:'Cartoon art from web likely copyrighted.', rec:'Commission/draw your own simple vector sheep or use CC0.', q:'black sheep cartoon public domain'},
+
+      // Chapter 2
+      {chapter: 2, fig: 'Fig. 1', desc: 'Diagram: domain, range, codomain of a function', filename: null, status:'low', reason:'Safe if you drew it yourself.', rec:'If sourced from web, redraw as your own vector.', q:'function diagram domain range codomain vector'},
+      {chapter: 2, fig: 'Fig. 15', desc: 'Joseph Liouville portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait on Commons.', q:'Joseph Liouville portrait'},
+      {chapter: 2, fig: 'Fig. 19', desc: 'John Napier portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait on Commons.', q:'John Napier portrait'},
+      {chapter: 2, fig: 'Fig. 20', desc: 'Slide rule photo', filename: null, status:'med', reason:'Modern photo may be copyrighted.', rec:'Use CC0 slide rule photos or shoot your own.', q:'slide rule photo public domain'},
+
+      // Chapter 3
+      {chapter: 3, fig: 'Fig. 1', desc: 'Electrified infinity symbol', filename: 'Infinity.png', status:'med', reason:'If sourced from web, likely copyrighted.', rec:'Create your own vector symbol with glow.', q:'infinity symbol vector CC0'},
+      {chapter: 3, fig: 'Fig. 5', desc: 'Daft Punk cover image', filename: 'ch1_daft.png', status:'high', reason:'Album cover art is copyrighted.', rec:'Remove or replace with non-album CC/PD imagery about music.', q:'electronic music abstract texture CC0'},
+      {chapter: 3, fig: 'Fig. 6', desc: 'Archimedes shouting “Eureka!” (cartoony)', filename: 'ch1_eureka1.jpg', status:'med', reason:'Cartoon likely copyrighted unless you drew it.', rec:'Use PD classical art or your own illustration.', q:'Archimedes painting public domain'},
+      {chapter: 3, fig: 'Fig. 7', desc: 'Nicolas Oresme portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Nicolas Oresme portrait'},
+      {chapter: 3, fig: 'Fig. 8', desc: 'Pietro Mengoli portrait', filename: 'ch1_mengoli.jpg', status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Pietro Mengoli portrait'},
+      {chapter: 3, fig: 'Fig. 10', desc: 'Leonhard Euler portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Leonhard Euler portrait'},
+      {chapter: 3, fig: 'Fig. 11', desc: 'Guido Grandi portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Guido Grandi portrait'},
+      {chapter: 3, fig: 'Fig. 12', desc: 'Planet of the Apes poster', filename: null, status:'high', reason:'Film poster is copyrighted.', rec:'Replace with CC/PD thematic image (e.g., ape silhouette).', q:'ape silhouette public domain'},
+
+      // Chapter 4
+      {chapter: 4, fig: 'Fig. 1', desc: 'French soldiers at war (historical)', filename: null, status:'med', reason:'Depends on photo source & date.', rec:'Prefer PD photos from national archives/Commons.', q:'French soldiers historical photo public domain'},
+      {chapter: 4, fig: 'Fig. 2', desc: 'Bernard Bolzano portrait', filename: 'ch2_bolzano.jpg', status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Bernard Bolzano portrait'},
+      {chapter: 4, fig: 'Fig. 11', desc: 'Star Trek image', filename: 'ch2_enterprise.jpg', status:'high', reason:'TV/film franchise imagery; copyrighted.', rec:'Swap for NASA spacecraft imagery (PD).', q:'spacecraft NASA'},
+      {chapter: 4, fig: 'Fig. 13', desc: 'François-Napoléon-Marie Moigno portrait/photo', filename: null, status:'low', reason:'19th‑century; likely PD.', rec:'Use PD portrait from Commons.', q:'François-Napoléon-Marie Moigno portrait'},
+      {chapter: 4, fig: 'Fig. 14', desc: 'Cartoony caveman', filename: 'ch2_caveman.jpg', status:'high', reason:'Cartoon art from web likely copyrighted.', rec:'Create your own vector caveman or use CC0.', q:'caveman cartoon public domain'},
+      {chapter: 4, fig: 'Fig. 15', desc: 'Stick figure knocking another down (“I win”)', filename: 'ch4win.png', status:'low', reason:'Probably safe if you created it.', rec:'If sourced, redraw as simple vector.', q:'stick figure vector CC0'},
+      {chapter: 4, fig: 'Fig. 16', desc: 'La Linea TV cartoon', filename: 'ch2_linea.jpg', status:'high', reason:'TV/cartoon character; copyrighted.', rec:'Replace with your own simple line character.', q:'line drawing character public domain'},
+      {chapter: 4, fig: 'Fig. 17', desc: 'The Simpsons image', filename: null, status:'high', reason:'TV/cartoon character; copyrighted.', rec:'Replace with original illustration.', q:'cartoon character public domain'},
+
+      // Chapter 5
+      {chapter: 5, fig: 'Fig. 1', desc: 'No caption (figure is fine)', filename: null, status:'low', reason:'Not flagged.', rec:'Leave as is.' , q:''},
+      {chapter: 5, fig: 'Fig. 5', desc: 'Young child acting out', filename: 'ch8_toddler2.png', status:'med', reason:'Model & copyright issues possible.', rec:'Use CC image with model release (or an illustration).', q:'child tantrum illustration CC'},
+
+      // Chapter 6
+      {chapter: 6, fig: 'Fig. 2', desc: 'Graph you made + photoshopped pointing hand', filename: null, status:'med', reason:'Graph OK; hand photo may be copyrighted.', rec:'Use your own hand photo or CC0 hand; keep attribution.', q:'pointing hand CC0 photo'},
+
+      // Chapter 7
+      {chapter: 7, fig: 'Fig. 2', desc: 'Batman comic panel', filename: null, status:'high', reason:'Comics imagery; copyrighted.', rec:'Replace with your own comic‑style panel.', q:'comic panel template CC0'},
+      {chapter: 7, fig: 'Fig. 5', desc: 'Graph of position, speed, acceleration (from internet)', filename: null, status:'med', reason:'Likely copyrighted screenshot.', rec:'Recreate the graph from data/code; add your own caption & source.', q:'kinematics graph generate Python'},
+      {chapter: 7, fig: 'Fig. 7', desc: 'Robin (Batman) image', filename: null, status:'high', reason:'Comics imagery; copyrighted.', rec:'Replace with generic sidekick silhouette you draw.', q:'superhero silhouette CC0'},
+      {chapter: 7, fig: 'Fig. 11', desc: '“POW” letters', filename: null, status:'med', reason:'If copied from show/comic, copyrighted.', rec:'Create your own vector “POW” burst.', q:'comic burst vector CC0'},
+      {chapter: 7, fig: 'Fig. 12', desc: 'Newton & Leibniz fighting (cartoony)', filename: 'newton_v_leibniz.png', status:'med', reason:'Cartoon art may be copyrighted.', rec:'Redraw in your style or use PD portraits montage.', q:'Isaac Newton portrait public domain'},
+      {chapter: 7, fig: 'Sec. 7.2', desc: 'Sandwich photo (not enumerated)', filename: null, status:'low', reason:'Generic stock risk.', rec:'Use CC0 sandwich photo.', q:'sandwich CC0 photo'},
+      {chapter: 7, fig: 'Fig. 20', desc: 'Patriot missile system in desert', filename: 'patriot.png', status:'low', reason:'Use U.S. DoD photo (PD).', rec:'Swap to an official DoD image with PD notice.', q:'Patriot missile system site:defense.gov'},
+
+      // Chapter 8
+      {chapter: 8, fig: 'Fig. 2', desc: 'Graph of Weierstrass function (grabbed)', filename: 'ch6_weierstrass.jpg', status:'med', reason:'Better to regenerate yourself.', rec:'Recreate the plot from code and cite yourself.', q:'Weierstrass function plot code'},
+      {chapter: 8, fig: 'Fig. 4', desc: 'Warning sign symbol', filename: null, status:'med', reason:'Some sign designs are copyrighted in certain jurisdictions.', rec:'Use PD/CC signage or draw your own triangle + exclamation.', q:'warning sign icon public domain'},
+
+      // Chapter 9
+      {chapter: 9, fig: 'Fig. 2', desc: '“Crazy grandmother” photo', filename: null, status:'high', reason:'Likely copyrighted & privacy concerns.', rec:'Use CC portrait with proper model release, or an illustration.', q:'elderly woman portrait CC BY'},
+      {chapter: 9, fig: 'Fig. 3', desc: 'Monopoly board fragment', filename: null, status:'high', reason:'Brand/trademark; copyrighted board design.', rec:'Replace with generic board game graphic you design.', q:'board game grid CC0'},
+      {chapter: 9, fig: 'Fig. 11', desc: 'Pierre de Fermat portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Pierre de Fermat portrait'},
+      {chapter: 9, fig: 'Fig. 13', desc: 'Rice Krispies cereal packaging', filename: 'rice_krispies.jpg', status:'high', reason:'Packaging & trademarks; copyrighted.', rec:'Replace with generic cereal box you design.', q:'cereal box mockup CC0'},
+      {chapter: 9, fig: 'Fig. 24', desc: 'Guillaume de l’Hôpital portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:"Guillaume de l'Hôpital portrait"},
+      {chapter: 9, fig: 'Fig. 30', desc: 'Karl Weierstrass portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Karl Weierstrass portrait'},
+
+      // Chapter 10
+      {chapter: 10, fig: 'Sec. 10.1', desc: '“Guess Who?” board game', filename: 'ch3_guesswho.jpg', status:'high', reason:'Brand/trademark; copyrighted board design.', rec:'Replace with a generic face-logic grid you design.', q:'face icons CC0 grid'},
+
+      // Chapter 11
+      {chapter: 11, fig: 'Fig. 1', desc: 'Woman parachuting', filename: null, status:'med', reason:'Modern photo licensing & model release required.', rec:'Use CC BY image with model release from trusted source.', q:'parachute skydiver CC BY'},
+      {chapter: 11, fig: 'Fig. 9', desc: 'Tacoma Narrows Bridge collapse', filename: null, status:'low', reason:'1940 event; many PD photos/frames.', rec:'Use PD photos from archives/Commons.', q:'Tacoma Narrows Bridge collapse public domain'},
+      {chapter: 11, fig: 'Fig. 10', desc: 'Generic MRI image', filename: null, status:'med', reason:'Medical images vary; check license.', rec:'Use CC BY images from NIH/Commons.', q:'MRI scan CC BY NIH'},
+      {chapter: 11, fig: 'Fig. 11', desc: 'Spectrogram screenshot', filename: null, status:'low', reason:'If generated by you, fine.', rec:'Generate your own spectrogram and export PNG.', q:'spectrogram audio generate open source'},
+      {chapter: 11, fig: 'Fig. 12', desc: 'JPEG compression illustration', filename: null, status:'low', reason:'Best recreated by you.', rec:'Create your own before/after JPEG demo.', q:'jpeg compression artifact demo'},
+
+      // Chapter 12
+      {chapter: 12, fig: 'Fig. 2', desc: 'Bernhard Riemann & Gaston Darboux photos', filename: 'ch6_Riemann.jpg + ch6_Darboux.jpg', status:'low', reason:'19th‑century photos; typically PD.', rec:'Use PD portraits from Commons.', q:'Bernhard Riemann portrait Gaston Darboux portrait'},
+      {chapter: 12, fig: 'Fig. 11', desc: 'Leibniz & Newton fighting (cartoony)', filename: 'newton_v_leibniz.png', status:'med', reason:'Cartoon art may be copyrighted.', rec:'Use PD portraits montage or your own drawing.', q:'Gottfried Wilhelm Leibniz portrait public domain'},
+
+      // Chapter 13
+      {chapter: 13, fig: 'Fig. 3', desc: 'Brook Taylor portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Brook Taylor portrait'},
+      {chapter: 13, fig: 'Fig. 8', desc: 'Colin Maclaurin portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Colin Maclaurin portrait'},
+      {chapter: 13, fig: 'Fig. 12', desc: 'Joseph‑Louis Lagrange portrait', filename: null, status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Joseph-Louis Lagrange portrait'},
+      {chapter: 13, fig: 'Fig. 14', desc: 'Video‑game character remixed into Munch’s Scream', filename: 'ch8_scream.jpg', status:'high', reason:'Derivative work includes copyrighted character.', rec:'Use the PD painting alone or your own original parody without brands.', q:"The Scream public domain high resolution"},
+      {chapter: 13, fig: 'Fig. 16', desc: 'Archimedes shouting “Eureka!” (cartoony)', filename: 'ch1_eureka1.jpg', status:'med', reason:'Cartoon likely copyrighted unless you drew it.', rec:'Use PD classical art or your own illustration.', q:'Archimedes painting public domain'},
+      {chapter: 13, fig: 'Fig. 17', desc: 'Pietro Mengoli portrait', filename: 'ch1_mengoli.jpg', status:'low', reason:'Historical portrait; typically PD.', rec:'Use PD portrait from Commons.', q:'Pietro Mengoli portrait'},
+      {chapter: 13, fig: 'Fig. 18', desc: 'Madhava of Sangamagrama image', filename: 'mini-project2_indian.jpg', status:'low', reason:'Historical illustration; often PD.', rec:'Use PD illustration with credit.', q:'Madhava of Sangamagrama portrait'},
+      {chapter: 13, fig: 'Fig. 19', desc: 'Generic Pac‑Man image', filename: null, status:'high', reason:'Game character/branding; copyrighted.', rec:'Replace with your own “dot‑eater” icon, no trademark shapes.', q:'arcade maze icon public domain'},
+      {chapter: 13, fig: 'Fig. 21', desc: 'Rayleigh‑Jeans vs Planck law graph', filename: 'planck.png', status:'low', reason:'If drawn by you, OK.', rec:'Keep or redraw with your own code; credit yourself.', q:'blackbody spectrum plot code'},
+      {chapter: 13, fig: 'Fig. 22', desc: 'Einstein by blackboard photo', filename: 'ch7_einstein.jpg', status:'med', reason:'Some Einstein photos are copyrighted; many are PD.', rec:'Use a PD‑marked photo from Commons with source.', q:'Einstein at blackboard public domain'}
+    ];
+
+    function buildLinks(it) {
+      const links = [];
+      if (!it.q) return links;
+      // Always include Commons + Openverse
+      links.push(linkBuilders.commons(it.q));
+      links.push(linkBuilders.openverse(it.q));
+      // Contextual extras
+      if (/space|spacecraft|NASA/i.test(it.q) || /Patriot/.test(it.q)) links.push(linkBuilders.nasa(it.q));
+      if (/Patriot|missile|military/i.test(it.q)) links.push(linkBuilders.dod(it.q));
+      if (/portrait|historical|soldiers|bridge|Tacoma/i.test(it.q)) links.push(linkBuilders.loc(it.q));
+      if (/portrait|painting|art|museum/i.test(it.q)) links.push(linkBuilders.met(it.q));
+      return links;
+    }
+
+    function fmtRisk(status) {
+      if (status === 'high') return '<span class="chip risk-high">High</span>';
+      if (status === 'med') return '<span class="chip risk-med">Medium</span>';
+      if (status === 'low') return '<span class="chip risk-low">Low</span>';
+      return '<span class="chip">Unknown</span>';
+    }
+
+    function itemHTML(it) {
+      const links = buildLinks(it)
+        .map(l => `<a class="linkbtn" target="_blank" href="${l.url}">${l.label}</a>`)
+        .join('');
+      const filename = it.filename ? it.filename : '<span class="muted">not found in log</span>';
+      const unknownClass = it.filename ? '' : 'data-unknown="true"';
+      return `
+        <article class="item" data-status="${it.status}" ${unknownClass} data-search="${(it.desc + ' ' + (it.filename||'')).toLowerCase()}">
+          <div class="row">
+            <div class="k">${it.fig} · Chapter ${it.chapter}</div>
+            <div>${fmtRisk(it.status)}</div>
+          </div>
+          <div><strong>${it.desc}</strong></div>
+          <div class="row">
+            <div class="k">Filename:</div>
+            <div class="filename">${filename} ${it.filename ? `<button class="copy" data-copy="${it.filename}">Copy</button>` : ''}</div>
+          </div>
+          <div class="k">Why: ${it.reason}</div>
+          <div class="k">Recommendation: ${it.rec}</div>
+          <div class="links">${links}</div>
+        </article>
+      `;
+    }
+
+    function render() {
+      // Group by chapter
+      const byChap = new Map();
+      for (const it of ITEMS) {
+        if (!byChap.has(it.chapter)) byChap.set(it.chapter, []);
+        byChap.get(it.chapter).push(it);
+      }
+      for (const [chap, list] of byChap) {
+        const mount = document.getElementById('list-ch'+chap);
+        if (!mount) continue;
+        mount.innerHTML = list.map(itemHTML).join('');
+      }
+    }
+
+    // Filters
+    function setFilter(which) {
+      document.querySelectorAll('.pill').forEach(b => b.classList.toggle('active', b.dataset.filter === which));
+      document.querySelectorAll('.item').forEach(el => {
+        const st = el.getAttribute('data-status');
+        const isUnknown = el.hasAttribute('data-unknown');
+        let show = true;
+        if (which === 'high') show = st === 'high';
+        else if (which === 'med') show = st === 'med';
+        else if (which === 'low') show = st === 'low';
+        else if (which === 'unknown') show = isUnknown;
+        else show = true;
+        el.style.display = show ? '' : 'none';
+      });
+    }
+
+    // Search
+    function setSearch(q) {
+      q = q.toLowerCase();
+      document.querySelectorAll('.item').forEach(el => {
+        const s = el.getAttribute('data-search');
+        el.style.display = s.includes(q) ? '' : 'none';
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t.matches('.pill')) setFilter(t.dataset.filter);
+      if (t.matches('.copy')) {
+        navigator.clipboard.writeText(t.dataset.copy);
+        t.textContent = 'Copied!';
+        setTimeout(()=> t.textContent = 'Copy', 1200);
+      }
+    });
+    document.getElementById('searchBox').addEventListener('input', (e)=> setSearch(e.target.value));
+
+    render();
+  </script>
+</body>
+</html>
